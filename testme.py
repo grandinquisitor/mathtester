@@ -41,12 +41,19 @@ class mathtest(object):
         
         return (result, diff)
 
+    @staticmethod
+    def _commafy(num):
+        r = []
+        for i, c in enumerate(reversed(str(num))):
+            if i and (not (i % 3)):
+                r.insert(0, ',')
+            r.insert(0, c)
+        return ''.join(r)
 
 
 
-class mult11l(mathtest):
+class m11l(mathtest):
     name = "multiply by 11 (low)"
-    key = "m11l"
 
     def setup(self):
         f = random.randint(1, 9)
@@ -62,9 +69,8 @@ class mult11l(mathtest):
 
 
 
-class mult11h(mathtest):
+class m11h(mathtest):
     name = "multiply by 11 (high)"
-    key = "m11h"
 
     def setup(self):
         f = random.randint(1, 9)
@@ -80,9 +86,8 @@ class mult11h(mathtest):
 
 
 
-class mult11b(mathtest):
+class m11b(mathtest):
     name = "multiply by 11 (both)"
-    key = "m11b"
 
     def setup(self):
         self.x = random.randint(10, 99)
@@ -97,7 +102,7 @@ class mult11b(mathtest):
 
 class add3(mathtest):
     name = "add 3 digit numbers"
-    key = "add3"
+    hint = "add left-to-right"
 
     def setup(self):
         self.x = random.randint(100, 999)
@@ -109,15 +114,64 @@ class add3(mathtest):
     def getprompt(self):
         return "%s + %s" % (self.x, self.y)
 
+class add3hi(mathtest):
+    name = "add 3 digit numbers, one is high"
+
+    def setup(self):
+        x = str(random.randint(100, 999))
+        self.x = int(x[0] + '9' + x[2])
+        self.y = random.randint(100, 999)
+        if random.randint(1,2) == 1:
+            swap = self.x
+            self.x = self.y
+            self.y = swap
+
+    def getcorrect(self):
+        return self.x + self.y
+
+    def getprompt(self):
+        return "%s + %s" % (self.x, self.y)
 
 
+class add43(mathtest):
+    name = "add a 4 digit and a 3 digit number"
+
+    def setup(self):
+        self.x = random.randint(1000, 9999)
+        self.y = random.randint(100, 999)
+        if random.randint(1,2) == 1:
+            swap = self.x
+            self.x = self.y
+            self.y = swap
+
+    def getcorrect(self):
+        return self.x + self.y
+
+    def getprompt(self):
+        return "%s + %s" % (self.x, self.y)
+
+
+
+class p10c(mathtest):
+    name = "power of 10 complement"
+    hint = "all numbers must sum to 9, except the last which must be 10"
+
+    def setup(self):
+        self.x = pow(10, random.randint(2, 6))
+        self.y = random.randint(1, self.x - 1)
+
+    def getcorrect(self):
+        return self.x - self.y
+
+    def getprompt(self):
+        return "%s - %s" % (self._commafy(self.x), self._commafy(self.y))
 
 
 
 somevar = None
 
 possible_tests = dict(
-    (somevar.key, somevar)
+    (somevar.__name__, somevar)
     for somevar in locals().itervalues()
     if isinstance(somevar, type) and mathtest in somevar.__bases__
     )
@@ -145,11 +199,17 @@ try:
             print
 
         else:
+            chosen_test = possible_tests[choice]
+
+            if hasattr(chosen_test, 'hint') and chosen_test.hint:
+                print
+                print "hint:", chosen_test.hint
+
             try:
                 for i in itertools.count():
                     print
                     print "test", i + 1
-                    testobj = possible_tests[choice]()
+                    testobj = chosen_test()
                     (result, timed) = testobj.runtest()
                     log.append((testobj.__class__.__name__, object.__hash__(testobj.__class__), result, timed, datetime.now()))
                     n += 1
