@@ -6,6 +6,7 @@ import itertools
 import os.path
 import cPickle as pickle
 from datetime import datetime
+from pprint import pprint
 
 
 
@@ -184,13 +185,31 @@ if os.path.exists(log_fname):
 else:
     log = []
 
+
+
+class datedict(dict):
+    # going overboard? yeah, probably
+    def __getitem__(self, y):
+        try:
+            item = dict.__getitem__(self, y)
+        except KeyError:
+            return "(never)"
+        assert isinstance(item, datetime)
+        return item.strftime("%Y-%m-%d")
+
+
+test_max_date = datedict()
+for log_entry in log:
+    test_max_date[log_entry[0]] = log_entry[4]
+
+
 n = 0
 
 try:
     while True:
         print "which test?"
         for key, test in sorted(possible_tests.iteritems(), key=lambda x: x[0]):
-            print "%s) %s" % (key, test.name)
+            print "%s) %s -- last taken: %s" % (key, test.name, test_max_date[key])
 
         choice = sys.stdin.readline().rstrip().lower()
 
