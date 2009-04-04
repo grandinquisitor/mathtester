@@ -7,8 +7,9 @@ import os.path
 
 
 log_fname = 'plog.pkl'
-xmax = 22
-ymax = 16
+xmax = 25
+ymax = 13
+alphachars = '!#$%&*+0123456789=?@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy'
 
 if not os.path.exists(log_fname):
     log = []
@@ -19,14 +20,18 @@ else:
 try:
     while 1:
         correct_points = 0
-        rang = random.randint(5, 11)
+        rang = random.randint(10, 15)
         for y in xrange(ymax):
             line = ''
             for x in xrange(xmax):
                 result = int(bool(random.randint(0,rang)))
                 if not result:
                     correct_points += 1
-                line += '* '[result]
+                    nextchar = random.choice(alphachars)
+                else:
+                    nextchar = ' '
+
+                line += nextchar
 
             print line
 
