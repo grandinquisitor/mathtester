@@ -95,6 +95,23 @@ class mult11b(mathtest):
         return "%s * %s" % (self.x, self.y)
 
 
+class add3(mathtest):
+    name = "add 3 digit numbers"
+    key = "add3"
+
+    def setup(self):
+        self.x = random.randint(100, 999)
+        self.y = random.randint(100, 999)
+
+    def getcorrect(self):
+        return self.x + self.y
+
+    def getprompt(self):
+        return "%s + %s" % (self.x, self.y)
+
+
+
+
 
 
 somevar = None
@@ -118,7 +135,7 @@ n = 0
 try:
     while True:
         print "which test?"
-        for key, test in possible_tests.iteritems():
+        for key, test in sorted(possible_tests.iteritems(), key=lambda x: x[0]):
             print "%s) %s" % (key, test.name)
 
         choice = sys.stdin.readline().rstrip().lower()
