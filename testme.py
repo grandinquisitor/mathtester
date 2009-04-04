@@ -6,8 +6,8 @@ import itertools
 import os.path
 import cPickle as pickle
 from datetime import datetime
+import hashlib
 from pprint import pprint
-
 
 
 
@@ -44,6 +44,7 @@ class mathtest(object):
 
     @staticmethod
     def _commafy(num):
+        "format with commas by the thousands"
         r = []
         for i, c in enumerate(reversed(str(num))):
             if i and (not (i % 3)):
@@ -51,6 +52,15 @@ class mathtest(object):
             r.insert(0, c)
         return ''.join(r)
 
+    @classmethod
+    def hashme(cls):
+        "hash this class definition"
+        hash = hashlib.md5()
+        for member in cls.__dict__.itervalues():
+            if isinstance(member, types.FunctionType):
+                hash.update(member.func_code.co_code)
+
+        return hash.hexdigest()[0:16]
 
 
 class m11l(mathtest):
@@ -230,7 +240,7 @@ try:
                     print "test", i + 1
                     testobj = chosen_test()
                     (result, timed) = testobj.runtest()
-                    log.append((testobj.__class__.__name__, object.__hash__(testobj.__class__), result, timed, datetime.now()))
+                    log.append((testobj.__class__.__name__, testobj.hashme(), result, timed, datetime.now()))
                     n += 1
                     time.sleep(1)
 
