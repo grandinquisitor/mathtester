@@ -20,6 +20,8 @@ class mathtest(object):
             return self.getanswer()
 
     def __init__(self):
+        # enforce that this is an abstract class
+        # in python 2.6, can use the abc module and @abstractmethod
         assert self.__class__ != mathtest
 
         assert hasattr(self, 'setup')
@@ -61,6 +63,13 @@ class mathtest(object):
                 hash.update(member.func_code.co_code)
 
         return hash.hexdigest()[0:16]
+
+    @classmethod
+    def getsubclasses(cls):
+        for subclass in cls.__subclasses__():
+            yield subclass
+            for subsubclass in subclass.getsubclasses():
+                yield subsubclass
 
 
 class m11l(mathtest):
@@ -178,13 +187,69 @@ class p10c(mathtest):
         return "%s - %s" % (self._commafy(self.x), self._commafy(self.y))
 
 
+class sub2b(mathtest):
+    name = "2 digit subtraction, any method"
+
+    def setup(self):
+        self.x = random.randint(50, 99)
+        self.y = random.randint(10, self.x-1)
+
+    def getcorrect(self):
+        return self.x - self.y
+
+    def getprompt(self):
+        return "%s - %s" % (self.x, self.y)
+
+class sub2e(sub2b):
+    name = "2 digit subtraction with no borrowing"
+    hint = "86 - 25 = 86 - 20 - 5"
+
+    def setup(self):
+        self.x = random.randint(50, 99)
+        x = str(self.x)
+        self.y = (random.randint(1, int(x[0])) * 10) + random.randint(1, int(x[1]))
+        # or: (random.randint(1, self.x // 10) * 10) + random.randint(1, self.x - ((self.x // 10) * 10)
+
+class sub2a(sub2b):
+    name = "2 digit subtraction using add-back method"
+    hint = "86-28 = (86 - 30) + 2"
+
+    def setup(self):
+        self.x = (random.randint(5, 9) * 10) + random.randint(1, 8)
+        x = str(self.x)
+        # last digit of first number must be less than 10 minus last digit of the second number
+        # in other words, 2nd digit of first number must be < 2nd digit of first number
+        self.y = (random.randint(1, int(x[0])-1) * 10) + random.randint(int(x[1])+1, 9)
+
+
+class sub3(sub2b):
+    name = "3 digit subtraction"
+    hint = "subtract the base 100, then add back the 100x complement. 534 - 467 = 534 - 500 + 33"
+
+    def setup(self):
+        (self.y, self.x) = sorted((random.randint(100,999), random.randint(100, 999)))
+
+class sub43(sub3):
+    name = "4 digit subtraction"
+    
+    def setup(self):
+        self.x = random.randint(1000, 9999)
+        self.y = random.randint(100, 999)
+
+
 
 somevar = None
 
+if False:
+    possible_tests = dict(
+        (somevar.__name__, somevar)
+        for somevar in locals().itervalues()
+        if isinstance(somevar, type) and mathtest in somevar.__bases__
+        )
+
 possible_tests = dict(
-    (somevar.__name__, somevar)
-    for somevar in locals().itervalues()
-    if isinstance(somevar, type) and mathtest in somevar.__bases__
+    (subclass.__name__, subclass)
+    for subclass in mathtest.getsubclasses()
     )
 
 
@@ -251,7 +316,7 @@ try:
 
 except KeyboardInterrupt:
     print "exiting..."
-finally:
+
     if n:
         print "save session? (Y)"
         answer = sys.stdin.readline().rstrip().upper()
