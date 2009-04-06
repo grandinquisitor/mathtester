@@ -225,6 +225,7 @@ class sub2a(sub2b):
 class sub3(sub2b):
     name = "3 digit subtraction"
     hint = "subtract the base 100, then add back the 100x complement. 534 - 467 = 534 - 500 + 33"
+    # note: I find that if the complement is high or the the last two digits are less than the last two digits of the other number, it's easy to just do it the normal l2r way
 
     def setup(self):
         (self.y, self.x) = sorted((random.randint(100,999), random.randint(100, 999)))
@@ -240,12 +241,6 @@ class sub43(sub3):
 
 somevar = None
 
-if False:
-    possible_tests = dict(
-        (somevar.__name__, somevar)
-        for somevar in locals().itervalues()
-        if isinstance(somevar, type) and mathtest in somevar.__bases__
-        )
 
 possible_tests = dict(
     (subclass.__name__, subclass)
@@ -264,27 +259,41 @@ else:
 
 class datedict(dict):
     # going overboard? yeah, probably
+
+    def __init__(self, log):
+        assert hasattr(log, '__iter__')
+
+        for log_entry in log:
+            prev_record = self.get(log_entry[0]) or (0, 0, 0, 0)
+            self[log_entry[0]] = (
+                log_entry[4], #date
+                prev_record[1] + 1, # num tries
+                prev_record[2] + log_entry[3], # total time
+                prev_record[3] + int(log_entry[2]) # total correct
+            )
+
     def __getitem__(self, y):
         try:
             item = dict.__getitem__(self, y)
         except KeyError:
-            return "(never)"
-        assert isinstance(item, datetime)
-        return item.strftime("%Y-%m-%d")
+            return "(never taken)"
+        assert isinstance(item[0], datetime)
+        return "%sx last: %s, %.3fs ave %.2f%%" % (item[1], item[0].strftime("%Y-%m-%d"), item[2] / item[1], (item[3] / float(item[1]) * 100))
 
 
-test_max_date = datedict()
-for log_entry in log:
-    test_max_date[log_entry[0]] = log_entry[4]
 
 
 n = 0
 
 try:
     while True:
+
+        test_max_date = datedict(log)
+
         print "which test?"
         for key, test in sorted(possible_tests.iteritems(), key=lambda x: x[0]):
-            print "%s) %s -- last taken: %s" % (key, test.name, test_max_date[key])
+            print "%s) %s -- %s" % (key, test.name, test_max_date[key])
+        print "total %s tests taken" % len(log)
 
         choice = sys.stdin.readline().rstrip().lower()
 
