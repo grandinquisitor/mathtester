@@ -71,8 +71,28 @@ class mathtest(object):
             for subsubclass in subclass.getsubclasses():
                 yield subsubclass
 
+    @staticmethod
+    def swap(x, y):
+        if random.randint(0, 1):
+             x = x ^ y
+             y = x ^ y
+             x = x ^ y
+        return (x, y)
 
-class m11l(mathtest):
+
+class m1(mathtest):
+    name = "1-digit multiplication"
+
+    def setup(self):
+        (self.x, self.y) = self.swap(random.randint(6,9), random.randint(3,9))
+
+    def getcorrect(self):
+        return self.x * self.y
+
+    def getprompt(self):
+        return "%s * %s" % (self.x, self.y)
+
+class m11l(m1):
     name = "multiply by 11 (low)"
 
     def setup(self):
@@ -81,15 +101,9 @@ class m11l(mathtest):
         self.x = int(str(f) + str(f2))
         self.y = 11
 
-    def getcorrect(self):
-        return self.x * self.y
-
-    def getprompt(self):
-        return "%s * %s" % (self.x, self.y)
 
 
-
-class m11h(mathtest):
+class m11h(m1):
     name = "multiply by 11 (high)"
 
     def setup(self):
@@ -98,26 +112,14 @@ class m11h(mathtest):
         self.x = int(str(f) + str(f2))
         self.y = 11
 
-    def getcorrect(self):
-        return self.x * self.y
-
-    def getprompt(self):
-        return "%s * %s" % (self.x, self.y)
 
 
-
-class m11b(mathtest):
+class m11b(m1):
     name = "multiply by 11 (both)"
 
     def setup(self):
         self.x = random.randint(10, 99)
         self.y = 11
-
-    def getcorrect(self):
-        return self.x * self.y
-
-    def getprompt(self):
-        return "%s * %s" % (self.x, self.y)
 
 
 class add3(mathtest):
@@ -141,10 +143,7 @@ class add3hi(mathtest):
         x = str(random.randint(100, 999))
         self.x = int(x[0] + '9' + x[2])
         self.y = random.randint(100, 999)
-        if random.randint(1,2) == 1:
-            swap = self.x
-            self.x = self.y
-            self.y = swap
+        (self.x, self.y) = self.swap(self.x, self.y)
 
     def getcorrect(self):
         return self.x + self.y
@@ -159,10 +158,7 @@ class add43(mathtest):
     def setup(self):
         self.x = random.randint(1000, 9999)
         self.y = random.randint(100, 999)
-        if random.randint(1,2) == 1:
-            swap = self.x
-            self.x = self.y
-            self.y = swap
+        (self.x, self.y) = self.swap(self.x, self.y)
 
     def getcorrect(self):
         return self.x + self.y
