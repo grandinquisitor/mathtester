@@ -94,7 +94,7 @@ class m11h(mathtest):
 
     def setup(self):
         f = random.randint(1, 9)
-        f2 = random.randint(9 - f, 9)
+        f2 = random.randint(10 - f, 9)
         self.x = int(str(f) + str(f2))
         self.y = 11
 
@@ -205,9 +205,9 @@ class sub2e(sub2b):
     hint = "86 - 25 = 86 - 20 - 5"
 
     def setup(self):
-        self.x = random.randint(50, 99)
-        x = str(self.x)
-        self.y = (random.randint(1, int(x[0])) * 10) + random.randint(1, int(x[1]))
+        x1, x2 = random.randint(5, 9), random.randint(1, 9)
+        self.x = (x1 * 10) + x2
+        self.y = (random.randint(1, x1) * 10) + random.randint(1, x2)
         # or: (random.randint(1, self.x // 10) * 10) + random.randint(1, self.x - ((self.x // 10) * 10)
 
 class sub2a(sub2b):
