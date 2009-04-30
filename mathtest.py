@@ -96,8 +96,9 @@ class m11l(m1):
     name = "multiply by 11 (low)"
 
     def setup(self):
-        f = random.randint(1, 9)
-        f2 = random.randint(1, 10 - f)
+        f = random.randint(1, 8)
+        f2 = random.randint(1, 9 - f)
+        f, f2 = self.swap(f, f2)
         self.x = int(str(f) + str(f2))
         self.y = 11
         self.x, self.y = self.swap(self.x, self.y)
