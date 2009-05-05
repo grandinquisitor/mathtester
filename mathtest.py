@@ -296,6 +296,28 @@ class sub3(sub2b):
     def setup(self):
         (self.y, self.x) = sorted((random.randint(100,999), random.randint(100, 999)))
 
+
+class sub3a(sub2b):
+    name = "3 digit subtraction, add-back method"
+    hint = "subtract the base 100, then add back the 100x complement. 534 - 467 = 534 - 500 + 33"
+    # note: I find that if the complement is high or the the last two digits are less than the last two digits of the other number, it's easy to just do it the normal l2r way
+
+    def setup(self):
+        x1, y1 = sorted((random.randint(1, 99), random.randint(1, 99)))
+        self.x = (random.randint(1, 9) * 100) + x1
+        self.y = (random.randint(1, self.x // 100) * 100) + y1
+
+
+class sub3e(sub2b):
+    name = "3 digit subtraction, no borrowing"
+    hint = "adding back the 100x complement should not be needed"
+
+    def setup(self):
+        y1, x1 = sorted((random.randint(1, 99), random.randint(1, 99)))
+        self.x = (random.randint(1, 9) * 100) + x1
+        self.y = (random.randint(1, self.x // 100) * 100) + y1
+
+
 class sub43(sub3):
     name = "4 digit subtraction"
     
@@ -403,6 +425,9 @@ if __name__ == '__main__':
 
                 else:
                     chosen_test = possible_tests[choice]
+
+                    print
+                    print chosen_test.name
 
                     if hasattr(chosen_test, 'hint') and chosen_test.hint:
                         print
