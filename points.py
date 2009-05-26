@@ -19,6 +19,7 @@ else:
 
 try:
     while 1:
+        print
         correct_points = 0
         rang = random.randint(10, 15)
         for y in xrange(ymax):
@@ -49,7 +50,6 @@ try:
 except KeyboardInterrupt:
     print "exiting..."
 
-finally:
-    if log:
-        print "saving..."
-        pickle.dump(log, open(log_fname, 'wb'))
+if log:
+    print "saving..."
+    pickle.dump(log, open(log_fname, 'wb'))
