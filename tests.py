@@ -299,7 +299,7 @@ class domecoded(mathtest):
 
 class ycode(mathtest):
     name = "year code calculations"
-    hint = "2-digit year truncated division by 4, then add back the year, then subtract largest multiple of seven (or just mod 7). add 1 for 19xx"
+    hint = "2-digit year truncated division by 4, then add back the year, then mod 7, and add 1 for 19xx"
 
     def setup(self):
         self.year = random.randint(1900, 2099)
@@ -354,6 +354,9 @@ class mod7(mod4):
     name = "modulo 7"
     mod = 7
 
+    def setup(self):
+        self.y = random.randint(0, 125)
+
 
 class trunc4(mathtest):
     name = "truncated division by 4"
@@ -375,4 +378,90 @@ class trunc4p4(trunc4):
 
     def getprompt(self):
         return "(%s // 4) + %s" % ((self.y,) * 2)
+
+class monthc(mathtest):
+    name = "month code for year calc"
+
+    codes = {
+        1: ('Jan', 6),
+        2: ('Feb', 2),
+        3: ('March', 2),
+        4: ('April', 5),
+        5: ('May', 0),
+        6: ('June', 3),
+        7: ('July', 5),
+        8: ('August', 1),
+        9: ('Sept', 4),
+        10: ('Oct', 6),
+        11: ('Nov', 2),
+        12: ('Dec', 4)
+    }
+
+    def setup(self):
+        self.month = random.randint(1,12)
+        self.year = random.randint(1900,2099)
+
+    def getcorrect(self):
+        return self.codes[self.month][1] - int(self.year % 4 == 0 and self.month in (1,2))
+
+    def getprompt(self):
+        return "%s, %s" % (self.codes[self.month][0], self.year)
+
+
+class day(monthc, ycode):
+    
+    name = "day of week calculations"
+    hint = None
+
+    @staticmethod
+    def random_date(start, end):
+        """
+        This function will return a random datetime between two datetime 
+        objects.
+        """
+        from random import randrange
+        from datetime import timedelta, datetime
+
+        delta = end - start
+        int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
+        random_second = randrange(int_delta)
+        return (start + timedelta(seconds=random_second))
+
+
+    def setup(self):
+        from datetime import datetime
+        self.date = self.random_date(datetime(1900,1,1), datetime(2099,12,31)).date()
+
+    def getcorrect(self):
+        return self.date.isoweekday()
+
+    def explicate(self):
+        parts = self.calc_year_code(self.date.year)
+        month = self.codes[self.date.month]
+        ans = ((parts[0] + month[1] + self.date.day) % 7, self.date.isoweekday())
+        wdays = ('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+        return """
+%s
+%s // 4 == %s
+%s + %s == %s
+%s %% 7 == %s
++ %s = %s
++ monthcode(%s) = %s
++ day = %s
++= %s
+= %s :== %s
+%s
+"""     %   (parts[0], 
+             parts[0], parts[1], 
+             parts[1], parts[0], parts[2], 
+             parts[2], parts[3],
+             parts[4], parts[5],
+             self.date.month, month,
+             self.date.day,
+             parts[0] + month[1] + self.date.day,
+             ans[0], ans[1],
+             wdays[ans[1]])
+
+    def getprompt(self):
+        return self.date.isoformat()
 
