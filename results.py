@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from itertools import *
 import cPickle as pickle
 import datetime
