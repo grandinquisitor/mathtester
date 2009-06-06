@@ -5,14 +5,15 @@ import cPickle as pickle
 import datetime
 from pprint import pprint
 import mathtest
+import gzip
 
-fname = 'log.pkl'
+fname = 'log.pkl.gz'
 date_ix = 4
 test_name_ix = 0
 
 keyfunc = lambda l: (l[test_name_ix], l[date_ix].date())
 
-log = pickle.load(open(fname, 'rb'))
+log = pickle.load(gzip.open(fname, 'rb'))
 
 last_test = None
 

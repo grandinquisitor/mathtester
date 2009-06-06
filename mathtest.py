@@ -9,6 +9,7 @@ import os.path
 import cPickle as pickle
 from datetime import datetime
 import hashlib
+import gzip
 from pprint import pprint
 
 class mathtest(object):
@@ -120,10 +121,10 @@ class datedict(dict):
 
 if __name__ == '__main__':
 
-    log_fname = 'log.pkl'
+    log_fname = 'log.pkl.gz'
 
     if os.path.exists(log_fname):
-        log = pickle.load(open(log_fname, 'rb'))
+        log = pickle.load(gzip.open(log_fname, 'rb'))
     else:
         log = []
 
@@ -185,4 +186,4 @@ if __name__ == '__main__':
             answer = sys.stdin.readline().rstrip().upper()
             if answer in ('', 'Y', 'YE', 'YES'):
                 print "saving..."
-                pickle.dump(log, open(log_fname, 'wb'))
+                pickle.dump(log, gzip.open(log_fname, 'wb'))
