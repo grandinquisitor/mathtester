@@ -144,7 +144,7 @@ if __name__ == '__main__':
                     print "%s) %s -- %s" % (key, test.name, test_max_date[key])
                 print "total %s tests taken" % len(log)
 
-                choice = sys.stdin.readline().rstrip().lower()
+                choice = raw_input('> ')
 
                 if choice not in possible_tests:
                     print "choice not found"
@@ -182,8 +182,7 @@ if __name__ == '__main__':
     finally:
         print "exiting..."
         if n:
-            print "save session? (Y)"
-            answer = sys.stdin.readline().rstrip().upper()
+            answer = raw_input("save session? (Y)\n")
             if answer in ('', 'Y', 'YE', 'YES'):
                 print "saving..."
                 pickle.dump(log, gzip.open(log_fname, 'wb'))
