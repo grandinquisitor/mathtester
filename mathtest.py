@@ -129,6 +129,24 @@ if __name__ == '__main__':
         log = []
 
 
+    # setup tab completion
+    import readline
+
+    def completer(text, state):
+        options = [x for x in possible_tests.iterkeys() if x.startswith(text)]
+        try:
+            return options[state]
+        except IndexError:
+            return None
+
+    readline.set_completer(completer)
+    readline.parse_and_bind("bind ^I rl_complete") # needed for os x 10.5 stock python install
+    readline.parse_and_bind("tab: complete")
+
+    # see the cmd module to create your own shell with its own syntax
+
+
+
     assert possible_tests
 
     n = 0
